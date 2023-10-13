@@ -35,5 +35,6 @@ js_library(
     deps = [
         ":node_modules/@typescript-eslint/eslint-plugin",
         ":node_modules/@typescript-eslint/parser",
+        ":node_modules/eslint-formatter-rdjson",
     ],
 )

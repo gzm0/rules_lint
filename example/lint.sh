@@ -18,8 +18,8 @@ bazel build --aspects //:lint.bzl%eslint,//:lint.bzl%buf,//:lint.bzl%flake8 --ou
 # Show the results.
 # `-mtime -1`: only look at files modified in the last day, to mitigate showing stale results of old bazel runs.
 # `-size +1c`: don't show files containing zero bytes
-for report in $(find $(bazel info bazel-bin) -mtime -1 -size +1c -type f -name "*-report.txt"); do
+for report in $(find $(bazel info bazel-bin) -mtime -1 -size +1c -type f -name "*-report.json"); do
     echo "From ${report}:"
-    cat "${report}"
+    cat "${report}" | reviewdog -f=rdjson -filter-mode=nofilter
     echo
 done
