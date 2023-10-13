@@ -25,22 +25,25 @@ def flake8_action(ctx, executable, srcs, config, report, use_exit_code = False):
         report: output file to generate
         use_exit_code: whether to fail the build when a lint violation is reported
     """
-    inputs = srcs + [config]
+    inputs = srcs + [config, executable]
     outputs = [report]
 
     # Wire command-line options, see
     # https://flake8.pycqa.org/en/latest/user/options.html
     args = ctx.actions.args()
     args.add_all(srcs)
-    args.add(report, format = "--output-file=%s")
+    args.add("--format=sarif")
     args.add(config, format = "--config=%s")
     if not use_exit_code:
         args.add("--exit-zero")
 
-    ctx.actions.run(
+    # The -output-file argument seems not to work with -format=sarif.
+    # So we pipe stdout instead.
+    # (https://github.com/bazelbuild/bazel/issues/5511 tracks ctx.actions.run support for stdout redirect)
+    ctx.actions.run_shell(
         inputs = inputs,
         outputs = outputs,
-        executable = executable,
+        command = "{flake8} $@ > {report}".format(flake8 = executable.path, report = report.path),
         arguments = [args],
         mnemonic = "flake8",
     )
@@ -48,7 +51,7 @@ def flake8_action(ctx, executable, srcs, config, report, use_exit_code = False):
 # buildifier: disable=function-docstring
 def _flake8_aspect_impl(target, ctx):
     if ctx.rule.kind in ["py_library"]:
-        report = ctx.actions.declare_file(target.label.name + ".flake8-report.txt")
+        report = ctx.actions.declare_file(target.label.name + ".flake8-report.sarif")
         flake8_action(ctx, ctx.executable._flake8, ctx.rule.files.srcs, ctx.file._config_file, report)
         results = depset([report])
     else:

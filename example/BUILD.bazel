@@ -25,6 +25,9 @@ exports_files(
 py_console_script_binary(
     name = "flake8",
     pkg = "@pip//flake8:pkg",
+    deps = [
+        "@pip//flake8_sarif_formatter",
+    ],
 )
 
 eslint_bin.eslint_binary(name = "eslint")
@@ -35,5 +38,6 @@ js_library(
     deps = [
         ":node_modules/@typescript-eslint/eslint-plugin",
         ":node_modules/@typescript-eslint/parser",
+        ":node_modules/@microsoft/eslint-formatter-sarif", # HACK!
     ],
 )

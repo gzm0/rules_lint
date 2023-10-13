@@ -3,6 +3,7 @@
     "eslint": "*",
     "@typescript-eslint/parser": "*",
     "@typescript-eslint/eslint-plugin": "*",
-    "typescript": "5.0"
+    "typescript": "5.0",
+    "@microsoft/eslint-formatter-sarif": "*"
   }
 }

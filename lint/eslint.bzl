@@ -38,6 +38,7 @@ def _eslint_action(ctx, executable, srcs, report, use_exit_code = False):
     # args.add("--debug")
 
     args.add_all(["--config", ctx.file._config_file.short_path])
+    args.add_all(["--format", "@microsoft/eslint-formatter-sarif"])
     args.add_all(["--output-file", report.short_path])
     args.add_all([s.short_path for s in srcs])
 
@@ -72,7 +73,7 @@ def _eslint_action(ctx, executable, srcs, report, use_exit_code = False):
 # buildifier: disable=function-docstring
 def _eslint_aspect_impl(target, ctx):
     if ctx.rule.kind in ["ts_project_rule"]:
-        report = ctx.actions.declare_file(target.label.name + ".eslint-report.txt")
+        report = ctx.actions.declare_file(target.label.name + ".eslint-report.sarif")
         _eslint_action(ctx, ctx.executable, ctx.rule.files.srcs, report)
         results = depset([report])
     else:
